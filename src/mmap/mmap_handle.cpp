@@ -2,10 +2,8 @@
 
 #include <algorithm>
 #include <string.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
 
-#include "../utils/sys_util.h"
+#include "utils/sys_util.h"
 
 namespace logger {
 
@@ -111,35 +109,22 @@ size_t MMapHandle::GetValidCapacity_(size_t size) {  // capacity 向上取虚拟
 }
 
 bool MMapHandle::Reserve_(size_t target_capacity) {
-    // new_capacity 向上取虚拟内存页面倍数
+    // target_capacity 向上取虚拟内存页面倍数
     target_capacity = GetValidCapacity_(target_capacity);
 
     if (target_capacity < capacity_) {
         return true;
     }
 
-    // 扩容 重新分配mmap
-    if (ReAllocateCapacity_(target_capacity)) {
-        return true;
-    }
-
-    return false;
-}
-
-bool MMapHandle::ReAllocateCapacity_(size_t new_capacity) {  // 只负责扩容
-
     size_t old_capacity = capacity_;
-    new_capacity = old_capacity + std::max(old_capacity, new_capacity);  // 扩容策略 follow vector 策略
-
-    // new_capacity 向上取虚拟内存页面倍数
-    new_capacity = GetValidCapacity_(new_capacity);
+    target_capacity = old_capacity + std::max(old_capacity, target_capacity);  // 扩容策略 follow vector 策略
 
     // 解除映射
     Unmap_();
 
     // 重新mmap新大小
-    if (TryMap_(new_capacity)) {
-        capacity_ = new_capacity;
+    if (TryMap_(target_capacity)) {
+        capacity_ = target_capacity;
         return true;
     }
 

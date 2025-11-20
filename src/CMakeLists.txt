@@ -1,5 +1,11 @@
-include_directories(./)
-add_definitions(-DDEBUG)
+
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/mmap
+    ${PROJECT_SOURCE_DIR}/src/utils
+)
+
+
 add_definitions(-DJM_XORSTR_DISABLE_AVX_INTRINSICS)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")

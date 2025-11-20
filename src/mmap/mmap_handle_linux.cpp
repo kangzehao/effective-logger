@@ -4,34 +4,30 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
+#include "internal_log.h"
+#include "defer.h"
 
 namespace logger {
-
-#ifdef DEBUG
-#define DEBUG_PRINT(...) fmt::print(__VA_ARGS__)
-#else
-#define DEBUG_PRINT(...)
-#endif
 
 bool MMapHandle::TryMap_(size_t capacity) {
     // 获取映射文件句柄 没有映射文件创建一个 （不覆盖）
     int fd = open(file_path_.string().c_str(), O_RDWR | O_CREAT, S_IRWXU);
-
+    DEFER {
+        if (fd) {
+            close(fd);
+        }
+    };
     if (fd == -1) {
-        DEBUG_PRINT("open file {} error: {}", file_path_.string(), fd);
+        LOG_ERROR("open file {} error: {}", file_path_.string(), fd);
         return false;
     }
 
     if (ftruncate(fd, capacity) == -1) {  // 设置文件为capacity大小
-        DEBUG_PRINT("file {} resize {} fail", file_path_.string(), capacity);
-        close(fd);
+        LOG_ERROR("file {} resize {} fail", file_path_.string(), capacity);
         return false;
     }
 
     handle_ = mmap(NULL, capacity, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);  // 进行内存映射
-    close(fd);
     return handle_ != MAP_FAILED;
 }
 

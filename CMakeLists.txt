@@ -1,6 +1,9 @@
 ﻿cmake_minimum_required(VERSION 3.16)
 project(logger)
 
+add_definitions(-DENABLE_LOG=1)
+
+
 include(${CMAKE_CURRENT_LIST_DIR}/build/conandeps_legacy.cmake)
 
 # include header

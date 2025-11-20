@@ -1,6 +1,6 @@
 ﻿set(LOGGER_VERSION "logger-test")
 include_directories(
-    ../src
+    ${PROJECT_SOURCE_DIR}/src
 )
 
 set(TEST 

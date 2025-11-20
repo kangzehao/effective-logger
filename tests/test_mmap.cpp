@@ -1,14 +1,11 @@
 #include <iostream>
-
-#include <fmt/core.h>
-#include <fmt/format.h>
-
-#include "mmap/mmap_handle.h"
-
 #include <vector>
 #include <cstring>
 #include <cassert>
 #include <filesystem>
+
+#include "internal_log.h"
+#include "mmap/mmap_handle.h"
 
 using namespace logger;
 
@@ -17,7 +14,7 @@ void test_constructor_and_empty() {
     MMapHandle mmap(test_file);
     assert(mmap.Empty());
     assert(mmap.Size() == 0);
-    fmt::print("test_constructor_and_empty passed\n");
+    LOG_INFO("test_constructor_and_empty passed\n");
 }
 
 void test_push_and_size() {
@@ -30,7 +27,7 @@ void test_push_and_size() {
     uint8_t* ptr = mmap.Data();
     assert(ptr != nullptr);
     assert(std::memcmp(ptr, data.data(), data.size()) == 0);
-    fmt::print("test_push_and_size passed\n");
+    LOG_INFO("test_push_and_size passed\n");
 }
 
 void test_push_and_read_string() {
@@ -44,7 +41,7 @@ void test_push_and_read_string() {
     assert(ptr != nullptr);
     std::string read_str(reinterpret_cast<char*>(ptr), mmap.Size());
     assert(read_str == msg);
-    fmt::print("test_push_and_read_string passed\n");
+    LOG_INFO("test_push_and_read_string passed\n");
 }
 
 void test_resize() {
@@ -55,7 +52,7 @@ void test_resize() {
     bool ok = mmap.Resize(10);
     assert(ok);
     assert(mmap.Size() == 10);
-    fmt::print("test_resize passed\n");
+    LOG_INFO("test_resize passed\n");
 }
 
 void test_clear() {
@@ -66,7 +63,7 @@ void test_clear() {
     mmap.Clear();
     assert(mmap.Size() == 0);
     assert(mmap.Empty());
-    fmt::print("test_clear passed\n");
+    LOG_INFO("test_clear passed\n");
 }
 
 int main() {
@@ -75,6 +72,6 @@ int main() {
     test_push_and_read_string();
     test_resize();
     test_clear();
-    fmt::print("All MMapHandle tests passed!\n");
+    LOG_INFO("All MMapHandle tests passed!\n");
     return 0;
 }

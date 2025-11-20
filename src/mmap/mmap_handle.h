@@ -1,5 +1,5 @@
 #pragma once
-#include "../utils/file_util.h"
+#include "utils/file_util.h"
 
 namespace logger {
 
@@ -54,8 +54,6 @@ private:
     }
 
     bool Reserve_(size_t target_capacity);
-
-    bool ReAllocateCapacity_(size_t new_capacity);
 
     bool TryMap_(size_t capacity);
 
