@@ -14,12 +14,12 @@ MMapHandle::MMapHandle(fpath file_path) : file_path_(std::move(file_path)), hand
     size_t set_capacity_size = std::max(file_size, kDefaultCapacity);
 
     // 初始化一定会触发扩容 mmap映射
-    Reserve_(set_capacity_size);
+    Reserve(set_capacity_size);
 
-    Init_();
+    Init();
 }
 
-MMapHandle::MMapHeader* MMapHandle::Header_() const {
+MMapHandle::MMapHeader* MMapHandle::Header() const {
     if (!handle_) {
         return nullptr;
     }
@@ -32,15 +32,15 @@ MMapHandle::MMapHeader* MMapHandle::Header_() const {
 }
 
 uint8_t* MMapHandle::Data() const {
-    if (!IsValid_()) {
+    if (!IsValid()) {
         return nullptr;
     }
 
     return static_cast<uint8_t*>(handle_) + sizeof(MMapHeader);
 }
 
-void MMapHandle::Init_() {
-    MMapHeader* header = Header_();
+void MMapHandle::Init() {
+    MMapHeader* header = Header();
     if (!header) {
         return;
     }
@@ -51,18 +51,19 @@ void MMapHandle::Init_() {
 }
 
 bool MMapHandle::Resize(size_t new_size) {
-    if (!IsValid_()) {
+    if (!IsValid()) {
         return false;
     }
     size_t need_capacity = sizeof(MMapHeader) + new_size;
 
-    if (need_capacity < capacity_) {  // 容量未满不做处理
+    if (need_capacity < capacity_) {  // 容量未满无需扩容, 只调整size大小
+        Header()->size = new_size;
         return true;
     }
 
     // 容量满了 调整capacity
-    if (Reserve_(need_capacity)) {  // 调整成功
-        Header_()->size = new_size;
+    if (Reserve(need_capacity)) {  // 超出容量，扩容
+        Header()->size = new_size;
         return true;
     }
 
@@ -70,7 +71,7 @@ bool MMapHandle::Resize(size_t new_size) {
 }
 
 size_t MMapHandle::Size() const {
-    MMapHeader* header = Header_();
+    MMapHeader* header = Header();
     if (header) {
         return header->size;
     }
@@ -78,16 +79,16 @@ size_t MMapHandle::Size() const {
 }
 
 bool MMapHandle::Push(const void* data, size_t data_size) {
-    if (!IsValid_()) {
+    if (!IsValid()) {
         return false;
     }
 
-    size_t need_capacity = sizeof(MMapHeader) + Header_()->size + data_size;
+    size_t need_capacity = sizeof(MMapHeader) + Header()->size + data_size;
 
-    if (Reserve_(need_capacity)) {
+    if (Reserve(need_capacity)) {
         memcpy(Data() + Size(), data, data_size);
 
-        Header_()->size += data_size;
+        Header()->size += data_size;
         return true;
     }
 
@@ -95,22 +96,22 @@ bool MMapHandle::Push(const void* data, size_t data_size) {
 }
 
 void MMapHandle::Clear() {
-    if (!IsValid_()) {
+    if (!IsValid()) {
         return;
     }
-    Header_()->size = 0;
+    Header()->size = 0;
 }
 
-size_t MMapHandle::GetValidCapacity_(size_t size) {  // capacity 向上取虚拟内存页面倍数
+size_t MMapHandle::GetValidCapacity(size_t size) {  // capacity 向上取虚拟内存页面倍数
 
     size_t page_size = GetPageSize();
     // 向上取虚拟内存页面倍数
     return ((size + page_size - 1) / page_size) * page_size;
 }
 
-bool MMapHandle::Reserve_(size_t target_capacity) {
+bool MMapHandle::Reserve(size_t target_capacity) {
     // target_capacity 向上取虚拟内存页面倍数
-    target_capacity = GetValidCapacity_(target_capacity);
+    target_capacity = GetValidCapacity(target_capacity);
 
     if (target_capacity < capacity_) {
         return true;
@@ -120,10 +121,10 @@ bool MMapHandle::Reserve_(size_t target_capacity) {
     target_capacity = old_capacity + std::max(old_capacity, target_capacity);  // 扩容策略 follow vector 策略
 
     // 解除映射
-    Unmap_();
+    Unmap();
 
     // 重新mmap新大小
-    if (TryMap_(target_capacity)) {
+    if (TryMap(target_capacity)) {
         capacity_ = target_capacity;
         return true;
     }
@@ -131,8 +132,8 @@ bool MMapHandle::Reserve_(size_t target_capacity) {
     return false;
 }
 
-bool MMapHandle::IsValid_() const {
-    MMapHeader* header = Header_();
+bool MMapHandle::IsValid() const {
+    MMapHeader* header = Header();
     if (!header) {
         return false;
     }

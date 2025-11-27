@@ -9,7 +9,7 @@
 
 namespace logger {
 
-bool MMapHandle::TryMap_(size_t capacity) {
+bool MMapHandle::TryMap(size_t capacity) {
     // 获取映射文件句柄 没有映射文件创建一个 （不覆盖）
     int fd = open(file_path_.string().c_str(), O_RDWR | O_CREAT, S_IRWXU);
     DEFER {
@@ -31,14 +31,14 @@ bool MMapHandle::TryMap_(size_t capacity) {
     return handle_ != MAP_FAILED;
 }
 
-void MMapHandle::Unmap_() {
+void MMapHandle::Unmap() {
     if (handle_) {
         munmap(handle_, capacity_);
     }
     handle_ = NULL;
 }
 
-void MMapHandle::Sync_() {
+void MMapHandle::Sync() {
     if (handle_) {
         msync(handle_, capacity_, MS_SYNC);
     }

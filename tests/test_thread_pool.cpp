@@ -11,14 +11,16 @@ using namespace logger;
 
 void test_simple_task() {
     ThreadPool pool(2);
+    pool.Start();
     auto fut = pool.SubmitWithFuture([]() { return 42; });
     assert(fut.get() == 42);
 
-    LOG_INFO("test_simple_task passed\n");
+    LOG_INFO("test_simple_task passed");
 }
 
 void test_multiple_tasks() {
     ThreadPool pool(4);
+    pool.Start();
     std::vector<std::future<int>> results;
     for (int i = 0; i < 10; ++i) {
         results.push_back(pool.SubmitWithFuture([i]() { return i * i; }));
@@ -27,11 +29,12 @@ void test_multiple_tasks() {
         assert(results[i].get() == i * i);
     }
 
-    LOG_INFO("test_multiple_tasks passed\n");
+    LOG_INFO("test_multiple_tasks passed");
 }
 
 void test_parallel_increment() {
     ThreadPool pool(4);
+    pool.Start();
     std::atomic<int> counter{0};
     std::vector<std::future<void>> tasks;
     for (int i = 0; i < 100; ++i) {
@@ -40,11 +43,12 @@ void test_parallel_increment() {
     for (auto& f : tasks) f.get();
     assert(counter == 100);
 
-    LOG_INFO("test_parallel_increment passed\n");
+    LOG_INFO("test_parallel_increment passed");
 }
 
 void test_submit_void_task() {
     ThreadPool pool(2);
+    pool.Start();
     std::atomic<int> counter{0};
     for (int i = 0; i < 10; ++i) {
         pool.Submit([&counter]() { counter++; });
@@ -52,7 +56,7 @@ void test_submit_void_task() {
     // 等待所有任务执行完毕
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     assert(counter == 10);
-    LOG_INFO("test_submit_void_task passed\n");
+    LOG_INFO("test_submit_void_task passed");
 }
 
 int main() {
@@ -60,6 +64,6 @@ int main() {
     test_multiple_tasks();
     test_parallel_increment();
     test_submit_void_task();
-    LOG_INFO("All ThreadPool tests passed!\n");
+    LOG_INFO("All ThreadPool tests passed!");
     return 0;
 }

@@ -19,8 +19,13 @@ public:
     // 禁用拷贝和移动操作
     ThreadPool(const ThreadPool& other) = delete;
     ThreadPool& operator=(const ThreadPool& other) = delete;
+
     ThreadPool(ThreadPool&& other) = delete;
     ThreadPool& operator=(ThreadPool&& other) = delete;
+
+    bool Start();
+
+    void Stop();
 
     size_t Size() const {
         return workers_vector_.capacity();
@@ -71,20 +76,20 @@ public:
 
         cv_.notify_one();
 
-        return res;
+        return std::move(res);  // future无法拷贝，可以移动返回或者返回一个共享指针对象
     }
 
 private:
     std::vector<std::thread> workers_vector_;
 
     // 类型擦除机制,存储符合void签名的可调用对象
-    std::queue<std::function<void()>> task_que_;
+    std::queue<std::function<void(void)>> task_que_;
 
     std::atomic<bool> is_running_;
     std::mutex mutex_task_que_;
     std::condition_variable cv_;
 
-    int pool_size_;
+    size_t pool_size_;
 
 private:
     void CreatePoolWorkers();

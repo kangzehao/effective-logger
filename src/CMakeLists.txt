@@ -18,7 +18,7 @@ else()
     message(FATAL_ERROR "unsupported.")
 endif()
 
-set(CONTEXT_SRCS context/thread_pool.cpp)
+set(CONTEXT_SRCS context/thread_pool.cpp context/executor.cpp context/context.cpp)
 
 set(SRCS
     ${MMAP_SRCS}

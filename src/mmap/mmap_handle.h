@@ -21,6 +21,10 @@ public:
 
     size_t Size() const;
 
+    size_t Capacity() const {
+        return capacity_;
+    }
+
     bool Push(const void* data, size_t data_size);
 
     void Clear();
@@ -43,24 +47,20 @@ private:
     size_t capacity_;
 
 private:
-    MMapHeader* Header_() const;
+    MMapHeader* Header() const;
 
-    void Init_();
+    void Init();
 
-    size_t GetValidCapacity_(size_t size);
+    size_t GetValidCapacity(size_t size);
 
-    size_t Capacity() const {
-        return capacity_;
-    }
+    bool Reserve(size_t target_capacity);
 
-    bool Reserve_(size_t target_capacity);
+    bool TryMap(size_t capacity);
 
-    bool TryMap_(size_t capacity);
+    void Unmap();
 
-    void Unmap_();
+    void Sync();  // 落盘
 
-    void Sync_();  // 落盘
-
-    bool IsValid_() const;
+    bool IsValid() const;
 };
 }  // namespace logger
