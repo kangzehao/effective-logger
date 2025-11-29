@@ -4,7 +4,9 @@ include_directories(
 )
 
 set(TEST 
-    test_mmap.cpp
+    #test_mmap.cpp
+    #test_thread_pool.cpp
+    test_context.cpp
 )
 
 add_executable(${LOGGER_VERSION} ${TEST})

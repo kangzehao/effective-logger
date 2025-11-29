@@ -3,7 +3,6 @@ project(logger)
 
 add_definitions(-DENABLE_LOG=1)
 
-
 include(${CMAKE_CURRENT_LIST_DIR}/build/conandeps_legacy.cmake)
 
 # include header
@@ -18,11 +17,6 @@ endif()
 
 message("logger version: " ${LOGGER_VERSION})
 add_definitions(-LOGGER_VERSION=${LOGGER_VERSION})
-
-if(NOT "$ENV{GIT_COMMIT_HASH}" STREQUAL "")
-    add_compile_definitions(GIT_COMMIT_HASH="$ENV{GIT_COMMIT_HASH}")
-    message("-- UDI: Current HEAD hash: $ENV{GIT_COMMIT_HASH}")
-endif()
 
 # c++17
 set(CMAKE_CXX_STANDARD 17)
