@@ -9,6 +9,7 @@ set(TEST
     test_thread_pool.cpp
     test_context.cpp
     test_compress.cpp
+    test_crypt.cpp
     tset_main.cpp
 )
 
