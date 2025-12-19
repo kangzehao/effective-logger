@@ -58,7 +58,7 @@
 > Spdlog 在处理大包时性能出现崩塌式下跌（RingBuffer 拷贝瓶颈），而 Effective Logger 表现出惊人的平稳性，几乎无视数据包大小的变化。
 
 *(Benchmark raw data visualization)*
-> *Benchmark 截图*
+> *![Benchmark 截图](https://github.com/kangzehao/effective-logger/blob/feature/effective/doc/img/data.jpg)*
 
 ---
 
@@ -160,7 +160,7 @@ int main() {
 * **交换 (Swap)**: 当 Master 满或超时，指针瞬间交换。后台线程随后对 Slave Buffer 进行落盘。
 
 ### 2. Strand 模型 (无锁串行化)
-不同于传统的 `Mutex` 抢锁机制，Effective Logger 采用类似 **Actor/Strand** 的设计。多线程请求被逻辑串行化，避免了操作系统层面的线程上下文切换（Context Switch）和锁竞争（Lock Contention），从而在高并发下实现了吞吐量的线性增长。
+不同于传统的 `Mutex` 抢锁机制，Effective Logger 采用类似 **Strand** 的设计。多线程请求被逻辑串行化，避免了操作系统层面的线程上下文切换（Context Switch）和锁竞争（Lock Contention），从而在高并发下实现了吞吐量的线性增长。
 
 ---
 
